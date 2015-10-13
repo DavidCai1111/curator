@@ -1,0 +1,31 @@
+{
+  "name": "curator",
+  "version": "0.0.1",
+  "description": "A timing job executor backed by Redis, support distribution mode.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidCai1993/curator.git"
+  },
+  "keywords": [
+    "cron",
+    "timing",
+    "distribution",
+    "redis"
+  ],
+  "author": "DavidCai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DavidCai1993/curator/issues"
+  },
+  "homepage": "https://github.com/DavidCai1993/curator#readme",
+  "dependencies": {
+    "bluebird": "^2.10.2",
+    "co": "^4.6.0",
+    "cron": "^1.0.9",
+    "ioredis": "^1.9.1"
+  }
+}
