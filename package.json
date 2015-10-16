@@ -4,7 +4,8 @@
   "description": "A timing job executor backed by Redis, support distribution mode.",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "npm test",
+    "dev": "DEBUG=curator node test.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "bluebird": "^2.10.2",
     "co": "^4.6.0",
     "cron": "^1.0.9",
+    "debug": "^2.2.0",
     "ioredis": "^1.9.1"
   }
 }

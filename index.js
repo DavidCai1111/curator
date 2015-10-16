@@ -5,6 +5,7 @@ const assert = require('assert')
 const Redis = require('ioredis')
 const CronJob = require('cron').CronJob
 const Promise = require('bluebird')
+const debug = require('debug')('curator')
 
 const getJob = fs.readFileSync('./lua/getJob.lua', 'utf-8')
 
@@ -15,14 +16,11 @@ const DEFAULT_OPTION = {
 }
 
 class Curator {
-  constructor(options = DEFAULT_OPTION) {
-    assert(typeof options.prefix === 'string', 'opations.prefix should be a string')
-    assert(typeof options.retry === 'number', 'opations.retry should be a number')
-    assert(typeof options.retryInterval === 'number', 'opations.retryInterval should be a number')
-
-    this.prefix = options.prefix
-    this.retry = options.retry
-    this.retryInterval = options.retryInterval
+  constructor(options) {
+    options = options || {}
+    this.prefix = options.prefix || DEFAULT_OPTION.prefix
+    this.retry = options.retry || DEFAULT_OPTION.retry
+    this.retryInterval = options.retryInterval || DEFAULT_OPTION.retryInterval
     this.jobs = {}
     this.redis = null
   }
@@ -46,20 +44,23 @@ class Curator {
     assert(typeof timming === 'string', 'timming should be a string')
     assert(typeof job === 'function', 'job should be a function')
     name = `${this.prefix}:${name}`
-
+    let ctx = this
     if (this.jobs[name]) {
       this.jobs[name].stop()
       delete this.jobs[name]
     }
 
-    this.redis.sadd({
-      name: 0
-    })
-    .then(() => {
-      this.job[name] = new CronJob(timming, () => {
-        this.redis.getJob(name)
-          .then(job())
-      })
+    this.redis.hset(['curator:jobs', name, 0])
+    .then((result) => {
+      debug(`add success: ${result}`)
+      ctx.jobs[name] = new CronJob(timming, () => {
+        ctx.redis.getJob(name)
+          .then((result) => {
+            job()
+          })
+      }).start()
     })
   }
 }
+
+module.exports = Curator
