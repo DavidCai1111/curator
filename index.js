@@ -5,6 +5,7 @@ const assert = require('assert')
 const Redis = require('ioredis')
 const CronJob = require('cron').CronJob
 const Promise = require('bluebird')
+const co = require('co')
 const debug = require('debug')('curator')
 
 const getJob = fs.readFileSync('./lua/getJob.lua', 'utf-8')
@@ -50,17 +51,20 @@ class Curator {
       delete this.jobs[name]
     }
 
-    this.redis.hset(['curator:jobs', name, 0])
-    .then((result) => {
-      debug(`add success: ${result}`)
+    co(function* () {
+      let nAdd = yield ctx.redis.hset(['curator:jobs', name, 0])
       ctx.jobs[name] = new CronJob(timming, () => {
-        ctx.redis.getJob(name)
-          .then((result) => {
-            job()
-          })
+        co(function* () {
+          let result = yield ctx.redis.getJob(name)
+          job()
+        }).catch(onerror)
       }).start()
-    })
+    }).catch(onerror)
   }
+}
+
+const onerror = function (err) {
+  debug(err)
 }
 
 module.exports = Curator
