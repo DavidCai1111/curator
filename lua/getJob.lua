@@ -3,11 +3,10 @@
 
 local objName = 'curator:jobs'
 
-local count = redis.call('hget', objName, KEYS[1])
+local result = redis.call('hget', objName, KEYS[1])
 
-if count != 0 then
-  local res = redis.call('hdel', objName, KEYS[1])
-  return 'success'
+if result == nil then
+  return nil
 end
 
-return 'fail'
+return redis.call('hdel', objName, KEYS[1])
