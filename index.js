@@ -62,12 +62,24 @@ class Curator {
     co(function* () {
       let nAdd = yield ctx.redis.addJob(name)
 
-      ctx.jobs[name] = new CronJob(timming, () => {
+      ctx.jobs[name] = {}
+      ctx.jobs[name].retry = ctx.retry
+      ctx.jobs[name].job = new CronJob(timming, () => {
         co(function* () {
           let result = yield ctx.redis.getJob(name)
-          job()
+          if (result === null) return
+          if (ctx.jobs[name].retry <= 0) return
+          job(done)
+
+          function done(err) {
+            if (!err) return
+            debug(`${name} Error: ${err}`)
+            if (--ctx.jobs[name].retry === 0) return
+            setTimeout(job.bind(null, done), ctx.retryInterval)
+          }
         }).catch(onerror)
       }).start()
+
     }).catch(onerror)
   }
 }

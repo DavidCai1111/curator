@@ -6,7 +6,9 @@ local objName = 'curator:jobs'
 local result = redis.call('hget', objName, KEYS[1])
 
 if result == nil then
-  return nil
+  result = nil
 end
 
-return redis.call('hdel', objName, KEYS[1])
+redis.call('hdel', objName, KEYS[1])
+
+return result

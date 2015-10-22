@@ -8,6 +8,6 @@ if result ~= nil then
   redis.call('hdel', objName, KEYS[1])
 end
 
-local nAdd = redis.call('hset', objName, KEYS[1], 0)
+local nAdd = redis.call('hset', objName, KEYS[1], 1)
 
 return nAdd
