@@ -61,10 +61,10 @@ class Curator {
 
     co(function* () {
       let nAdd = yield ctx.redis.addJob(name)
-
       ctx.jobs[name] = {}
       ctx.jobs[name].retry = ctx.retry
       ctx.jobs[name].job = new CronJob(timming, () => {
+        console.log('do');
         co(function* () {
           let result = yield ctx.redis.getJob(name)
           if (result === null) return
