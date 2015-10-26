@@ -1,5 +1,5 @@
 {
-  "name": "curator",
+  "name": "node-curator",
   "version": "0.0.1",
   "description": "A timing job executor backed by Redis, support distribution mode.",
   "main": "index.js",
