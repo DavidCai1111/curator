@@ -1,5 +1,4 @@
-'use strict';
-
+'use strict'
 const fs = require('fs')
 const assert = require('assert')
 const Redis = require('ioredis')
@@ -17,7 +16,7 @@ const DEFAULT_OPTION = {
 }
 
 class Curator {
-  constructor(options) {
+  constructor (options) {
     options = options || {}
     this.prefix = options.prefix || DEFAULT_OPTION.prefix
     this.retry = options.retry || DEFAULT_OPTION.retry
@@ -28,7 +27,7 @@ class Curator {
     return this
   }
 
-  connect(config) {
+  connect (config) {
     if (Array.isArray(config)) {
       this.redis = new Redis.Cluster(config)
     } else {
@@ -48,7 +47,7 @@ class Curator {
     return this
   }
 
-  add(name, timming, job) {
+  add (name, timming, job) {
     assert(typeof name === 'string', 'name should be a string')
     assert(typeof timming === 'string', 'timming should be a string')
     assert(typeof job === 'function', 'job should be a function')
@@ -59,19 +58,18 @@ class Curator {
       delete this.jobs[name]
     }
 
-    co(function* () {
-      let nAdd = yield ctx.redis.addJob(name)
-      ctx.jobs[name] = {}
+    co(function * () {
+      yield ctx.redis.addJob(name)
+      ctx.jobs[name] = Object.create(null)
       ctx.jobs[name].retry = ctx.retry
       ctx.jobs[name].job = new CronJob(timming, () => {
-        console.log('do');
-        co(function* () {
+        co(function * () {
           let result = yield ctx.redis.getJob(name)
           if (result === null) return
           if (ctx.jobs[name].retry <= 0) return
           job(done)
 
-          function done(err) {
+          function done (err) {
             if (!err) return
             debug(`${name} Error: ${err}`)
             if (--ctx.jobs[name].retry === 0) return
@@ -79,13 +77,12 @@ class Curator {
           }
         }).catch(onerror)
       }).start()
-
     }).catch(onerror)
   }
 }
 
 const onerror = function (err) {
-  debug(err)
+  console.error(err)
 }
 
 module.exports = Curator

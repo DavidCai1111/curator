@@ -4,8 +4,8 @@
   "description": "A timing job executor backed by Redis, support distribution mode.",
   "main": "index.js",
   "scripts": {
-    "test": "npm test",
-    "dev": "DEBUG=curator node test.js"
+    "test": "standard && mocha",
+    "dev": "standard && DEBUG=curator node test.js"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "istanbul": "^0.4.0",
     "mocha": "^2.3.3",
     "should": "^7.1.0",
-    "sinon": "^1.17.2"
+    "sinon": "^1.17.2",
+    "standard": "^5.3.1"
   }
 }
